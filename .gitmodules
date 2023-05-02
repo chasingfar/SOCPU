@@ -1,0 +1,6 @@
+[submodule "extern/DCSim"]
+	path = extern/DCSim
+	url = https://github.com/chasingfar/DCSim.git
+[submodule "extern/SOASM"]
+	path = extern/SOASM
+	url = https://github.com/chasingfar/SOASM
