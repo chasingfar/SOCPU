@@ -1,10 +1,9 @@
 
 #include <iostream>
-#include <socpu/cpuv2/ucode.hpp>
-#include "src/soarchv2"
+#include <socpu/soarchv2.hpp>
 #include <socpu/vm.hpp>
 
-using namespace EZCPU;
+using namespace SOCPU;
 /*
 std::ostream& operator<<(std::ostream& os,CPUv2::CTL ctl){
 	using namespace CPUv2;
@@ -53,22 +52,22 @@ void generateROM(std::ostream& os,std::ranges::input_range auto data){
 }
 
 int main() {
-	std::cout << "Hello, World!" << std::endl;
+	/*std::cout << "Hello, World!" << std::endl;
 	if(std::ofstream fout("ezcpuv2-ezisv1.txt");fout) {
 		using namespace EZCPU;
 		using namespace std::views;
 		generateROM(fout,iota(0uz)|take(1uz<<19uz)|transform([](size_t i){
 			return CPUv2::uCode(i).generate<EZISv1::InstrSet>().val();
 		}));
-	}
-	/*Sim::VM<Sim::CPUv2::CPU,EZISv1::InstrSet> vm;
+	}*/
+	Sim::VM<SOARCHv2::CPU,SOASM::SOISv1::InstrSet> vm;
 	{
-		using namespace EZISv1;
-		using ezis=EZISv1::InstrSet;
-		std::cout<<ezis::get_id<Jump>()<<std::endl;
+		using namespace SOASM::SOISv1;
+		using sois=InstrSet;
+		std::cout<<sois::get_id<Jump>()<<std::endl;
 		//std::cout<<ezis::get_id<Pop>()<<std::endl;
 		//std::cout<<sizeof(Pop)<<std::endl;
-		EZISv1::InstrSet::Instrs program{
+		sois::Instrs program{
 			ImmVal{}(3),
 			Pop{.to=Reg::A}(),
 			ImmVal{}(0),
@@ -95,7 +94,7 @@ int main() {
 		//for(auto [name,id,w]:ezis::list_instr()){
 		//	std::cout<<std::format("{}:{} {}",name,id<<w,1<<w)<<std::endl;
 		//}
-	}*/
+	}
 	/*{
 		using namespace EZCPU::CPUv2;
 		Config cfg{ARG{.instr=63}.val()};
@@ -115,10 +114,10 @@ int main() {
 		}
 		std::cout<<"],"<<std::endl;
 	}*/
-/*
+
 	vm.reset();
 	for(int i=0;i<50;i++){
-		using namespace EZCPU::CPUv2;
+		using namespace SOARCHv2;
 		//if(i==8){DCSim::Circuit::debug=true;}
 		//if(i==10){DCSim::Circuit::debug=false;}
 		vm.tick_instr();
@@ -128,7 +127,7 @@ int main() {
 			break;
 		}
 	}
-	*/
+	
 	//port_print_linked(vm.cpu.mo.buf.O);
 	//port_print_linked(vm.cpu.mi.buf.I);
 	//port_print_linked(vm.cpu.mi.buf.O);

@@ -19,5 +19,8 @@ include_directories(extern/DCsim/include)
 include_directories(extern/SOASM/include)
 
 include_directories(include)
-add_executable(socpu main.cpp src/soarchv2/ucode.cpp src/soarchv2/soisv1.cpp)
+add_library(soarchv2_soisv1 src/soarchv2/ucode.cpp src/soarchv2/soisv1.cpp)
+add_executable(socpu main.cpp)
+target_link_libraries(socpu dcsim soarchv2_soisv1)
+
 #target_link_libraries(ezcpu dcsim)

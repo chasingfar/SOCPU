@@ -2,7 +2,7 @@
 #ifndef SOCPU_SOARCHV2_REGS_HPP
 #define SOCPU_SOARCHV2_REGS_HPP
 #include <utility>
-#include "soasm/soisv1.hpp"
+#include <soasm/soisv1.hpp>
 namespace SOCPU::SOARCHv2::Regs{
 	using namespace SOASM::SOISv1::Regs;
 	enum struct MReg:uint8_t{
