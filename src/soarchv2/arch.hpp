@@ -71,27 +71,26 @@ namespace SOCPU::SOARCHv2 {
 		using val_t = uint32_t;
 		static constexpr MReg default_reg = MReg::H;
 
-		val_t index:7;
-		Carry CF:1;
-
-		val_t IF:1;
-		val_t INTA:1;
-		ALUFN alu_fn:5;
-		Carry alu_c:1;
-
-		MReg xs:4;
-		MReg ys:4;
-		MReg zs:4;
-
 		enum struct Dir:val_t{
 			M2M = 0b00,/*should not used*/
 			M2R = 0b01,
 			R2M = 0b10,
 			R2R = 0b11,
 		} dir:2;
+		ALUFN alu_fn:5;
+		Carry alu_c:1;
+
+		val_t index:7;
+		Carry CF:1;
+		val_t IF:1;
+		val_t INTA:1;
 		val_t unused:2;
 
-		[[nodiscard]] CTL load(MReg16 from, MReg to) const{
+		MReg xs:4;
+		MReg ys:4;
+		MReg zs:4;
+
+		[[nodiscard]] CTL load(MReg to, MReg16 from) const{
 			CTL ctl{*this};
 			ctl.xs=to;
 			ctl.ys=toL(from);
@@ -99,7 +98,7 @@ namespace SOCPU::SOARCHv2 {
 			ctl.dir=Dir::M2R;
 			return ctl;
 		}
-		[[nodiscard]] CTL save(MReg from, MReg16 to) const{
+		[[nodiscard]] CTL save(MReg16 to, MReg from) const{
 			CTL ctl{*this};
 			ctl.xs=from;
 			ctl.ys=toL(to);
@@ -108,7 +107,7 @@ namespace SOCPU::SOARCHv2 {
 			return ctl;
 		}
 
-		[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg lhs,MReg rhs,MReg dst) const{
+		[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg dst,MReg lhs=default_reg,MReg rhs=default_reg) const{
 			CTL ctl{*this};
 			ctl.alu_fn=fn.first;
 			ctl.alu_c=fn.second;
@@ -118,15 +117,15 @@ namespace SOCPU::SOARCHv2 {
 			ctl.dir=Dir::R2R;
 			return ctl;
 		}
-		[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg lhs,MReg dst) const{
+		/*[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg lhs,MReg dst) const{
 			return calc(fn,lhs,default_reg,dst);
 		}
 		[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg dst) const{
 			return calc(fn,default_reg,default_reg,dst);
-		}
+		}*/
 
-		[[nodiscard]] CTL copy(MReg from,MReg to) const{
-			return calc(ALU::passA(),from,to);
+		[[nodiscard]] CTL copy(MReg to,MReg from) const{
+			return calc(ALU::passA(),to,from);
 		}
 		[[nodiscard]] CTL nop() const{
 			return copy(default_reg,default_reg);

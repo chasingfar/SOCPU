@@ -22,44 +22,44 @@ namespace SOCPU::SOARCHv2 {
 		[[nodiscard]] gen_t gen(Instr) const;
 
 		[[nodiscard]] gen_t halt() const;
-		[[nodiscard]] gen_t load(MReg16 from, MReg to) const;
-		[[nodiscard]] gen_t save(MReg from, MReg16 to) const;
-		[[nodiscard]] gen_t copy(MReg from, MReg to) const;
-		[[nodiscard]] gen_t copy(MReg16 from, MReg16 to) const;
+		[[nodiscard]] gen_t load(MReg to, MReg16 from) const;
+		[[nodiscard]] gen_t save(MReg16 to, MReg from) const;
+		[[nodiscard]] gen_t copy(MReg to, MReg from) const;
+		[[nodiscard]] gen_t copy(MReg16 to, MReg16 from) const;
 
-		[[nodiscard]] gen_t inc(MReg from, MReg to) const;
-		[[nodiscard]] gen_t inc(MReg from, MReg to, Carry carry) const;
+		[[nodiscard]] gen_t inc(MReg to, MReg from) const;
+		[[nodiscard]] gen_t inc(MReg to, MReg from, Carry carry) const;
 		[[nodiscard]] gen_t inc(MReg reg) const;
 		[[nodiscard]] gen_t inc(MReg reg, Carry carry) const;
 		[[nodiscard]] gen_t inc(MReg16 reg16) const;
 
-		[[nodiscard]] gen_t dec(MReg from, MReg to) const;
-		[[nodiscard]] gen_t dec(MReg from, MReg to, Carry carry) const;
+		[[nodiscard]] gen_t dec(MReg to, MReg from) const;
+		[[nodiscard]] gen_t dec(MReg to, MReg from, Carry carry) const;
 		[[nodiscard]] gen_t dec(MReg reg) const;
 		[[nodiscard]] gen_t dec(MReg reg, Carry carry) const;
 		[[nodiscard]] gen_t dec(MReg16 reg16) const;
 
-		[[nodiscard]] gen_t add(MReg lhs, MReg rhs, MReg dst, Carry carry) const;
-		[[nodiscard]] gen_t add(MReg lhs, MReg rhs, MReg dst) const;
-		[[nodiscard]] gen_t add(MReg16 lhs, MReg16 rhs, MReg16 dst) const;
-		[[nodiscard]] gen_t sub(MReg lhs, MReg rhs, MReg dst, Carry carry) const;
-		[[nodiscard]] gen_t sub(MReg lhs, MReg rhs, MReg dst) const;
-		[[nodiscard]] gen_t sub(MReg16 lhs, MReg16 rhs, MReg16 dst) const;
-		[[nodiscard]] gen_t shift_left(MReg lhs, MReg dst, unsigned pad) const;
-		[[nodiscard]] gen_t shift_left(MReg lhs, MReg dst, Carry carry) const;
-		[[nodiscard]] gen_t shift_right(MReg lhs, MReg dst, unsigned pad) const;
-		[[nodiscard]] gen_t shift_right(MReg lhs, MReg dst, Carry CF) const;
-		[[nodiscard]] gen_t logic_and(MReg lhs, MReg rhs, MReg dst) const;
-		[[nodiscard]] gen_t logic_or(MReg lhs, MReg rhs, MReg dst) const;
-		[[nodiscard]] gen_t logic_not(MReg lhs, MReg dst) const;
-		[[nodiscard]] gen_t logic_xor(MReg lhs, MReg rhs, MReg dst) const;
+		[[nodiscard]] gen_t add(MReg dst, MReg lhs, MReg rhs, Carry carry) const;
+		[[nodiscard]] gen_t add(MReg dst, MReg lhs, MReg rhs) const;
+		[[nodiscard]] gen_t add(MReg16 dst, MReg16 lhs, MReg16 rhs) const;
+		[[nodiscard]] gen_t sub(MReg dst, MReg lhs, MReg rhs, Carry carry) const;
+		[[nodiscard]] gen_t sub(MReg dst, MReg lhs, MReg rhs) const;
+		[[nodiscard]] gen_t sub(MReg16 dst, MReg16 lhs, MReg16 rhs) const;
+		[[nodiscard]] gen_t shift_left(MReg dst, MReg lhs, unsigned pad) const;
+		[[nodiscard]] gen_t shift_left(MReg dst, MReg lhs, Carry carry) const;
+		[[nodiscard]] gen_t shift_right(MReg dst, MReg lhs, unsigned pad) const;
+		[[nodiscard]] gen_t shift_right(MReg dst, MReg lhs, Carry CF) const;
+		[[nodiscard]] gen_t logic_and(MReg dst, MReg lhs, MReg rhs) const;
+		[[nodiscard]] gen_t logic_or(MReg dst, MReg lhs, MReg rhs) const;
+		[[nodiscard]] gen_t logic_not(MReg dst, MReg lhs) const;
+		[[nodiscard]] gen_t logic_xor(MReg dst, MReg lhs, MReg rhs) const;
 		[[nodiscard]] gen_t set_zero(MReg dst) const;
 		[[nodiscard]] gen_t set_zero(MReg16 reg16) const;
 		[[nodiscard]] gen_t set_minus_one(MReg reg) const;
 		[[nodiscard]] gen_t set_minus_one(MReg reg, Carry carry) const;
 		[[nodiscard]] gen_t set_minus_one(MReg16 reg16) const;
-		[[nodiscard]] gen_t test_zero(MReg lhs, MReg dst) const;
-		[[nodiscard]] gen_t test_less(MReg lhs, MReg rhs, MReg dst) const;
+		[[nodiscard]] gen_t test_zero(MReg dst, MReg lhs) const;
+		[[nodiscard]] gen_t test_less(MReg dst, MReg lhs, MReg rhs) const;
 		[[nodiscard]] gen_t save_carry() const;
 
 		[[nodiscard]] gen_t sign_extend(MReg low, MReg high) const;
@@ -77,9 +77,9 @@ namespace SOCPU::SOARCHv2 {
 		[[nodiscard]] gen_t load_imm_extend(MReg16 reg16) const;
 		[[nodiscard]] gen_t jump(MReg16 addr) const;
 		[[nodiscard]] gen_t branch(MReg16 addr, Carry cond = Carry::yes) const;
-		[[nodiscard]] gen_t branch_zero(MReg16 addr, MReg lhs, MReg dst) const;
+		[[nodiscard]] gen_t branch_zero(MReg16 addr, MReg lhs, MReg tmp) const;
 		[[nodiscard]] gen_t branch_zero(MReg16 addr, MReg lhs) const;
-		[[nodiscard]] gen_t branch_less(MReg16 addr, MReg lhs, MReg rhs, MReg dst) const;
+		[[nodiscard]] gen_t branch_less(MReg16 addr, MReg lhs, MReg rhs, MReg tmp) const;
 	};
 }
 #endif //SOCPU_SOARCHV2_UCODE_HPP

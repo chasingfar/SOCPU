@@ -16,45 +16,45 @@ namespace SOCPU::SOARCHv2 {
 	}
 	template<> uCode::gen_t uCode::gen(LoadFar instr) const{
 		co_yield load_imm(MReg16::TMP);
-		co_yield add(toM(instr.from),MReg16::TMP,MReg16::TMP);
-		co_yield load(MReg16::TMP,MReg::TMA);
+		co_yield add(MReg16::TMP,toM(instr.from),MReg16::TMP);
+		co_yield load(MReg::TMA,MReg16::TMP);
 		co_yield stack_push(MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(SaveFar instr) const{
 		co_yield load_imm(MReg16::TMP);
-		co_yield add(toM(instr.to),MReg16::TMP,MReg16::TMP);
+		co_yield add(MReg16::TMP,toM(instr.to),MReg16::TMP);
 		co_yield stack_pop(MReg::TMA);
-		co_yield save(MReg::TMA,MReg16::TMP);
+		co_yield save(MReg16::TMP,MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(LoadNear instr) const{
 		co_yield load_imm_extend(MReg16::TMP);
-		co_yield add(toM(instr.from),MReg16::TMP,MReg16::TMP);
-		co_yield load(MReg16::TMP,MReg::TMA);
+		co_yield add(MReg16::TMP,toM(instr.from),MReg16::TMP);
+		co_yield load(MReg::TMA,MReg16::TMP);
 		co_yield stack_push(MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(SaveNear instr) const{
 		co_yield load_imm_extend(MReg16::TMP);
-		co_yield add(toM(instr.to),MReg16::TMP,MReg16::TMP);
+		co_yield add(MReg16::TMP,toM(instr.to),MReg16::TMP);
 		co_yield stack_pop(MReg::TMA);
-		co_yield save(MReg::TMA,MReg16::TMP);
+		co_yield save(MReg16::TMP,MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(Load instr) const{
-		co_yield load(toM(instr.from),MReg::TMA);
+		co_yield load(MReg::TMA,toM(instr.from));
 		co_yield stack_push(MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(Save instr) const{
 		co_yield stack_pop(MReg::TMA);
-		co_yield save(MReg::TMA,toM(instr.to));
+		co_yield save(toM(instr.to),MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(SaveImm instr) const{
 		co_yield load_imm(MReg::TMA);
-		co_yield save(MReg::TMA,toM(instr.to));
+		co_yield save(toM(instr.to),MReg::TMA);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(Push instr) const{
@@ -69,10 +69,10 @@ namespace SOCPU::SOARCHv2 {
 
 #define ARG_1 co_yield stack_pop(MReg::TML);
 #define ARG_2 ARG_1 co_yield stack_pop(MReg::TMH);
-#define CALC_1(fn,name)  case Calc::FN::fn: ARG_1 co_yield name(MReg::TML,MReg::TMA,0);break;
-#define CALC_1C(fn,name) case Calc::FN::fn: ARG_1 co_yield name(MReg::TML,MReg::TMA,arg.CF);break;
-#define CALC_2(fn,name)  case Calc::FN::fn: ARG_2 co_yield name(MReg::TMH,MReg::TML,MReg::TMA);break;
-#define CALC_2C(fn,name) case Calc::FN::fn: ARG_2 co_yield name(MReg::TMH,MReg::TML,MReg::TMA,arg.CF);break;
+#define CALC_1(fn,name)  case Calc::FN::fn: ARG_1 co_yield name(MReg::TMA,MReg::TML,0);break;
+#define CALC_1C(fn,name) case Calc::FN::fn: ARG_1 co_yield name(MReg::TMA,MReg::TML,arg.CF);break;
+#define CALC_2(fn,name)  case Calc::FN::fn: ARG_2 co_yield name(MReg::TMA,MReg::TMH,MReg::TML);break;
+#define CALC_2C(fn,name) case Calc::FN::fn: ARG_2 co_yield name(MReg::TMA,MReg::TMH,MReg::TML,arg.CF);break;
 		switch (instr.fn){
 			CALC_1( SHL,shift_left)
 			CALC_1( SHR,shift_right)
@@ -98,8 +98,8 @@ namespace SOCPU::SOARCHv2 {
 
 #define ARG_1 co_yield stack_pop(MReg::TML);
 #define ARG_2 ARG_1 co_yield stack_pop(MReg::TMH);
-#define LOGIC_1(fn,name)  case Logic::FN::fn: ARG_1 co_yield name(MReg::TML,MReg::TMA);break;
-#define LOGIC_2(fn,name)  case Logic::FN::fn: ARG_2 co_yield name(MReg::TMH,MReg::TML,MReg::TMA);break;
+#define LOGIC_1(fn,name)  case Logic::FN::fn: ARG_1 co_yield name(MReg::TMA,MReg::TML);break;
+#define LOGIC_2(fn,name)  case Logic::FN::fn: ARG_2 co_yield name(MReg::TMA,MReg::TMH,MReg::TML);break;
 		switch (instr.fn){
 			LOGIC_1(NOT,logic_not)
 			LOGIC_2(AND,logic_and)
@@ -152,16 +152,16 @@ namespace SOCPU::SOARCHv2 {
 	}
 	template<> uCode::gen_t uCode::gen(Adjust instr) const{
 		co_yield load_imm(MReg16::TMP);
-		co_yield add(MReg16::SP,MReg16::TMP,MReg16::SP);
+		co_yield add(MReg16::SP,MReg16::SP,MReg16::TMP);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(Enter instr) const{
 		co_yield stack_push(toM(instr.bp));
-		co_yield copy(MReg16::SP,toM(instr.bp));
+		co_yield copy(toM(instr.bp),MReg16::SP);
 		co_yield next_op();
 	}
 	template<> uCode::gen_t uCode::gen(Leave instr) const{
-		co_yield copy(toM(instr.bp),MReg16::SP);
+		co_yield copy(MReg16::SP,toM(instr.bp));
 		co_yield stack_pop(toM(instr.bp));
 		co_yield next_op();
 	}

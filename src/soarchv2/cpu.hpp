@@ -117,7 +117,7 @@ namespace SOCPU::SOARCHv2{
 				bus.RST >> sreg.clr >> regs[0].clr;
 				bus.CLK >> sreg.clk >> regs[0].clk >> mw_or.A;
 
-			CU.D>>(Port<2>{}|mr|mw|zs|ys|xs|ALU.CMS|ctl_state);
+				CU.D>>(zs|ys|xs|Port<2>{}|ctl_state|ALU.CMS|mr|mw);
 				sreg.D>>(ctl_state|ALU.Co);
 				CU.A>>(regs[0].Q | sreg.Q);
 				mw_or.Y>>bus.WR;
