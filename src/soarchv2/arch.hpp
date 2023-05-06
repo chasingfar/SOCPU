@@ -147,9 +147,9 @@ namespace SOCPU::SOARCHv2 {
 				case Dir::M2M:
 					return "[M2M][Waring]";
 				case Dir::M2R:
-					return std::format("Reg[{}]=Mem[{}|{}]", x, y, z);
+					return std::format("Reg[{0}]=Mem[{2}:{1}]", x, y, z);
 				case Dir::R2M:
-					return std::format("Mem[{}|{}]=Reg[{}]", x, y, z);
+					return std::format("Mem[{2}:{1}]=Reg[{0}]", x, y, z);
 				case Dir::R2R:
 					return std::format("Reg[{}]={}", x, ALU::parse_fn(alu_c, alu_fn, y, z));
 			}
