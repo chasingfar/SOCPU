@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <fstream>
 #include <socpu/soarchv2.hpp>
 #include <socpu/vm.hpp>
 
@@ -47,34 +48,34 @@ void generateROM(std::ostream& os,std::ranges::input_range auto data){
 	os<<"v2.0 raw\r\n";
 	os<<std::hex;
 	for(auto [i,v]:std::views::zip(std::views::iota(0),data)){
-		os<<v<<(i%8==7?"\r\n":" ");
+		os<<(unsigned long long)v<<(i%8==7?"\r\n":" ");
 	}
 }
 
 int main() {
 	/*std::cout << "Hello, World!" << std::endl;
-	if(std::ofstream fout("ezcpuv2-ezisv1.txt");fout) {
-		using namespace EZCPU;
+	if(std::ofstream fout("soarchv2-soisv1.txt");fout) {
 		using namespace std::views;
 		generateROM(fout,iota(0uz)|take(1uz<<19uz)|transform([](size_t i){
-			return CPUv2::uCode(i).generate<EZISv1::InstrSet>().val();
+			return SOARCHv2::uCode(i).generate<SOASM::SOISv1::InstrSet>().val();
 		}));
 	}*/
 	Sim::VM<SOARCHv2::CPU,SOASM::SOISv1::InstrSet> vm;
 	{
 		using namespace SOASM::SOISv1;
-		using sois=InstrSet;
-		std::cout<<sois::get_id<Jump>()<<std::endl;
+		//using sois=InstrSet;
+		//std::cout<<sois::get_id<Jump>()<<std::endl;
 		//std::cout<<ezis::get_id<Pop>()<<std::endl;
 		//std::cout<<sizeof(Pop)<<std::endl;
-		sois::Instrs program{
+		SOASM::Label::tbl_t LT;
+		SOASM::ASM<InstrSet>::Code program{
 			ImmVal{}(3),
 			Pop{.to=Reg::A}(),
 			ImmVal{}(0),
 			Pop{.to=Reg::B}(),
-
+			LT["start"],
 			Push{.from=Reg::A}(),
-			BranchZero{}(22),
+			BranchZero{}(LT["end"]),
 
 			Push{.from=Reg::A}(),
 			Push{.from=Reg::B}(),
@@ -86,15 +87,88 @@ int main() {
 			Calc{.fn=Calc::FN::SUB}(),
 			Pop{.to=Reg::A}(),
 
-			Jump{}(6),
-
+			Jump{}(LT["start"]),
+			LT["end"],
 			Halt{}(),
 		};
-		vm.load(program);
+		vm.load(program.assemble());
 		//for(auto [name,id,w]:ezis::list_instr()){
 		//	std::cout<<std::format("{}:{} {}",name,id<<w,1<<w)<<std::endl;
 		//}
 	}
+	//Sim::VM<SOARCHv2::CPU,SOASM::SOISv1::InstrSet> vm;
+	/*{
+		using namespace SOASM::SOISv1;
+		using sois=InstrSet;
+		std::cout<<sois::get_id<Jump>()<<std::endl;
+		//std::cout<<ezis::get_id<Pop>()<<std::endl;
+		//std::cout<<sizeof(Pop)<<std::endl;
+		auto write_data=[](uint8_t d){return SaveImm{.to=Reg16::HL}(d);};
+		auto write_char=[&](char c){return write_data(c-'A'+0x21);};
+		auto write_command=[](uint8_t d){return SaveImm{.to=Reg16::FE}(d);};
+		sois::Instrs program{
+			ImmVal{}(0x40),
+			Pop{.to=Reg::H}(),
+			ImmVal{}(0x00),
+			Pop{.to=Reg::L}(),
+			ImmVal{}(0x40),
+			Pop{.to=Reg::F}(),
+			ImmVal{}(0x01),
+			Pop{.to=Reg::E}(),
+			ImmVal{}(40),
+			Pop{.to=Reg::A}(),
+
+			write_data(0x00),
+  			write_data(0x00),
+  			write_command(0x40), // set text home address
+
+  			write_data(0x1E), // 240/8
+  			write_data(0x00),
+  			write_command(0x41), // set text area
+
+  			write_command(0x80), // mode set - exor mode
+  			write_command(0x94), // display mode - graphic on, text on
+
+
+			write_data(0x00),
+			write_data(0x00),
+			write_command(0x24),
+
+			write_command(0xB0), // auto write
+
+			Push{.from=Reg::A}(),
+			BranchZero{}(75),
+			
+  			write_char('H'),
+  			write_char('e'),
+  			write_char('l'),
+  			write_char('l'),
+  			write_char('o'),
+  			write_char(' '),
+  			write_char('w'),
+  			write_char('o'),
+  			write_char('r'),
+  			write_char('l'),
+  			write_char('d'),
+  			write_char('!'),
+			Push{.from=Reg::A}(),
+			ImmVal{}(1),
+			Calc{.fn=Calc::FN::SUB}(),
+			Pop{.to=Reg::A}(),
+
+			Jump{}(39),
+			Halt{}(),
+		};
+		
+		if(std::ofstream fout("hello-text-soisv1.txt");fout) {
+			using namespace std::views;
+			generateROM(fout,program);
+		}
+		//vm.load(program);
+		//for(auto [name,id,w]:ezis::list_instr()){
+		//	std::cout<<std::format("{}:{} {}",name,id<<w,1<<w)<<std::endl;
+		//}
+	}*/
 	/*{
 		using namespace EZCPU::CPUv2;
 		Config cfg{ARG{.instr=63}.val()};
@@ -120,14 +194,18 @@ int main() {
 		using namespace SOARCHv2;
 		//if(i==8){DCSim::Circuit::debug=true;}
 		//if(i==10){DCSim::Circuit::debug=false;}
+		//if(i<5){
 		vm.tick_instr();
+		//}else{
+		//	vm.tick();
+		//}
 		std::cout<<i<<std::endl;
-		std::cout<<vm.print(vm.cpu.get_ptrs({MReg16::SP,MReg16::PC}))<<std::endl;
+		std::cout<<vm.print(vm.cpu.get_ptrs({MReg16::SP,MReg16::PC,MReg16::HL}))<<std::endl;
 		if(vm.is_halt()){
 			break;
 		}
 	}
-	
+
 	//port_print_linked(vm.cpu.mo.buf.O);
 	//port_print_linked(vm.cpu.mi.buf.I);
 	//port_print_linked(vm.cpu.mi.buf.O);
