@@ -45,15 +45,11 @@ namespace SOCPU::SOARCHv2::Regs{
 		using M=to_machine<From>;
 		return static_cast<M::type>(std::to_underlying(reg)+std::to_underlying(M::offset));
 	}
-	template<typename From>
-	auto toL(From reg16){
-		using To=to_narrow<From>::type;
-		return static_cast<To>((std::to_underlying(reg16)<<1)+0);
+	inline auto toL(MReg16 reg16){
+		return static_cast<MReg>((std::to_underlying(reg16)<<1)+0);
 	}
-	template<typename From>
-	auto toH(From reg16){
-		using To=to_narrow<From>::type;
-		return static_cast<To>((std::to_underlying(reg16)<<1)+1);
+	inline auto toH(MReg16 reg16){
+		return static_cast<MReg>((std::to_underlying(reg16)<<1)+1);
 	}
 }
 #endif //SOCPU_SOARCHV2_REGS_HPP
