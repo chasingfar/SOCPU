@@ -143,15 +143,15 @@ uCode::gen_t uCode::sign_extend(MReg16 reg16) const{
 	co_yield sign_extend(toL(reg16),toH(reg16));
 }
 
-uCode::gen_t uCode::load_op() const{
+uCode::gen_t uCode::load_instr() const{
 	co_yield load(MReg::INST,MReg16::PC);
 }
-uCode::gen_t uCode::init_op() const{
+uCode::gen_t uCode::init_instr() const{
 	co_yield set_zero(MReg::INST);
 }
-uCode::gen_t uCode::next_op() const{
+uCode::gen_t uCode::next_instr() const{
 	co_yield inc(MReg16::PC);
-	co_yield load_op();
+	co_yield load_instr();
 }
 uCode::gen_t uCode::stack_pop(MReg reg) const{
 	co_yield inc(MReg16::SP);
@@ -184,7 +184,7 @@ uCode::gen_t uCode::load_imm(MReg16 reg16,bool from_int) const{
 }
 uCode::gen_t uCode::jump(MReg16 addr) const{
 	co_yield copy(MReg16::PC,addr);
-	co_yield load_op();
+	co_yield load_instr();
 }
 uCode::gen_t uCode::branch(MReg16 addr,Carry cond) const{
 	if(arg.CF==cond){

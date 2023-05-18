@@ -6,64 +6,64 @@ using namespace SOASM::SOISv1;
 
 namespace SOCPU::SOARCHv2 {
 	template<> uCode::gen_t uCode::gen(Unknown instr) const{
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Init instr) const{
-		co_yield init_op();
+		co_yield init_instr();
 		co_yield set_minus_one(MReg16::SP);//Reg16::SP=0xFFFF
 		co_yield set_zero(MReg16::PC);//Reg16::PC=0x0000
-		co_yield load_op();//load op from MEM[0]
+		co_yield load_instr();//load op from MEM[0]
 	}
 	template<> uCode::gen_t uCode::gen(LoadFar instr) const{
 		co_yield load_imm(MReg16::TMP);
 		co_yield add(MReg16::TMP,toM(instr.from),MReg16::TMP);
 		co_yield load(MReg::TMA,MReg16::TMP);
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(SaveFar instr) const{
 		co_yield load_imm(MReg16::TMP);
 		co_yield add(MReg16::TMP,toM(instr.to),MReg16::TMP);
 		co_yield stack_pop(MReg::TMA);
 		co_yield save(MReg16::TMP,MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(LoadNear instr) const{
 		co_yield load_imm_extend(MReg16::TMP);
 		co_yield add(MReg16::TMP,toM(instr.from),MReg16::TMP);
 		co_yield load(MReg::TMA,MReg16::TMP);
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(SaveNear instr) const{
 		co_yield load_imm_extend(MReg16::TMP);
 		co_yield add(MReg16::TMP,toM(instr.to),MReg16::TMP);
 		co_yield stack_pop(MReg::TMA);
 		co_yield save(MReg16::TMP,MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Load instr) const{
 		co_yield load(MReg::TMA,toM(instr.from));
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Save instr) const{
 		co_yield stack_pop(MReg::TMA);
 		co_yield save(toM(instr.to),MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(SaveImm instr) const{
 		co_yield load_imm(MReg::TMA);
 		co_yield save(toM(instr.to),MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Push instr) const{
 		co_yield stack_push(toM(instr.from));
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Pop instr) const{
 		co_yield stack_pop(toM(instr.to));
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Calc instr) const{
 
@@ -92,7 +92,7 @@ namespace SOCPU::SOARCHv2 {
 
 		co_yield save_carry();
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Logic instr) const{
 
@@ -112,18 +112,18 @@ namespace SOCPU::SOARCHv2 {
 #undef LOGIC_2
 
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(BranchCF instr) const{
 		co_yield load_imm(MReg16::TMP);
 		co_yield branch(MReg16::TMP);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(BranchZero instr) const{
 		co_yield stack_pop(MReg::TMA);
 		co_yield load_imm(MReg16::TMP);
 		co_yield branch_zero(MReg16::TMP,MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Jump instr) const{
 		co_yield load_imm(MReg16::TMP);
@@ -132,7 +132,7 @@ namespace SOCPU::SOARCHv2 {
 	template<> uCode::gen_t uCode::gen(ImmVal instr) const{
 		co_yield load_imm(MReg::TMA);
 		co_yield stack_push(MReg::TMA);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Call instr) const{
 		co_yield load_imm(MReg16::TMP);
@@ -153,17 +153,17 @@ namespace SOCPU::SOARCHv2 {
 	template<> uCode::gen_t uCode::gen(Adjust instr) const{
 		co_yield load_imm(MReg16::TMP);
 		co_yield add(MReg16::SP,MReg16::SP,MReg16::TMP);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Enter instr) const{
 		co_yield stack_push(toM(instr.bp));
 		co_yield copy(toM(instr.bp),MReg16::SP);
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Leave instr) const{
 		co_yield copy(MReg16::SP,toM(instr.bp));
 		co_yield stack_pop(toM(instr.bp));
-		co_yield next_op();
+		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Halt instr) const{
 		co_yield halt();
