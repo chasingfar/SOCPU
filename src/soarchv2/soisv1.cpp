@@ -169,12 +169,21 @@ namespace SOCPU::SOARCHv2 {
 		co_yield halt();
 	}
 	template<> uCode::gen_t uCode::gen(INTCall instr) const{
-		if(!arg.isINT()){
+		auto save_IF=ctl.nop();
+		save_IF.IF=arg.isINT()?1:0;
+		co_yield save_IF;
+		if(arg.IF==1){
+			co_yield stack_push(MReg16::PC);
+			co_yield load_imm(MReg16::PC,true);
+			auto jump_to=ctl.load(MReg::INST,MReg16::PC);
+			jump_to.IF=0;
+			co_yield jump_to;
+		}else{
 			co_yield inc(MReg16::PC);
+			co_yield stack_push(MReg16::PC);
+			co_yield load_imm(MReg16::TMP);
+			co_yield jump(MReg16::TMP);
 		}
-		co_yield stack_push(MReg16::PC);
-		co_yield load_imm(MReg16::PC,arg.isINT());
-		co_yield jump(MReg16::TMP);
 	}
 
 } // SOCPU::SOARCHv2

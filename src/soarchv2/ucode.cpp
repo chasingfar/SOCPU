@@ -3,7 +3,11 @@
 using namespace SOCPU::SOARCHv2;
 
 uCode::gen_t uCode::halt() const{
-	co_yield ctl.nop();
+	if(arg.isINT()){
+		co_yield ctl.load(MReg::INST).int_ack();
+	}else{
+		co_yield ctl.nop();
+	}
 }
 uCode::gen_t uCode::copy(MReg to,MReg from) const{
 	co_yield ctl.copy(to,from);
@@ -144,7 +148,11 @@ uCode::gen_t uCode::sign_extend(MReg16 reg16) const{
 }
 
 uCode::gen_t uCode::load_instr() const{
-	co_yield load(MReg::INST,MReg16::PC);
+	if(arg.isINT()){
+		co_yield ctl.load(MReg::INST).int_ack();
+	}else{
+		co_yield load(MReg::INST,MReg16::PC);
+	}
 }
 uCode::gen_t uCode::init_instr() const{
 	co_yield set_zero(MReg::INST);
@@ -179,8 +187,13 @@ uCode::gen_t uCode::stack_push(MReg16 reg16) const{
 	co_yield stack_push(toL(reg16));
 }
 uCode::gen_t uCode::load_imm(MReg16 reg16,bool from_int) const{
-	co_yield load_imm(toL(reg16));
-	co_yield load_imm(toH(reg16));
+	if(from_int){
+		co_yield ctl.load(toL(reg16)).int_ack();
+		co_yield ctl.load(toH(reg16)).int_ack();
+	}else{
+		co_yield load_imm(toL(reg16));
+		co_yield load_imm(toH(reg16));
+	}	
 }
 uCode::gen_t uCode::jump(MReg16 addr) const{
 	co_yield copy(MReg16::PC,addr);

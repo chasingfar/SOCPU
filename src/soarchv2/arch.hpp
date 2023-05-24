@@ -54,7 +54,7 @@ namespace SOCPU::SOARCHv2 {
 		val_t :13;//padding to 32bit
 
 		[[nodiscard]] bool isINT() const {
-			return IRQ == 0;
+			return IRQ == 1;
 		}
 
 		val_t val() const {
@@ -70,6 +70,7 @@ namespace SOCPU::SOARCHv2 {
 		static constexpr size_t size = 32;
 		using val_t = uint32_t;
 		static constexpr MReg default_reg = MReg::H;
+		static constexpr MReg16 default_reg16 = MReg16::HL;
 
 		enum struct Dir:val_t{
 			M2M = 0b00,/*should not used*/
@@ -90,7 +91,7 @@ namespace SOCPU::SOARCHv2 {
 		MReg ys:4;
 		MReg zs:4;
 
-		[[nodiscard]] CTL load(MReg to, MReg16 from) const{
+		[[nodiscard]] CTL load(MReg to, MReg16 from=default_reg16) const{
 			CTL ctl{*this};
 			ctl.xs=to;
 			ctl.ys=toL(from);
@@ -115,6 +116,11 @@ namespace SOCPU::SOARCHv2 {
 			ctl.ys=lhs;
 			ctl.zs=rhs;
 			ctl.dir=Dir::R2R;
+			return ctl;
+		}
+		[[nodiscard]] CTL int_ack() const{
+			CTL ctl{*this};
+			ctl.INTA=0;
 			return ctl;
 		}
 		/*[[nodiscard]] CTL calc(ALU::alu_ctl_t fn,MReg lhs,MReg dst) const{

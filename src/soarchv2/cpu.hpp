@@ -86,9 +86,9 @@ namespace SOCPU::SOARCHv2{
 			NOT<1> rw{name+"[RW]"},rr{name+"[RR]"};
 			OR<1> mw_or{name+"[MW_OR]"};
 
-			Port<10> ctl_state;
+			Port<9> ctl_state;
 			Port<4> xs,ys,zs;
-			Port<1> mr,mw;
+			Port<1> mr,mw,IRQ{Level::PullDown},INTA;
 
 			static constexpr auto get_reg_name(size_t idx){
 				return magic_enum::enum_name(static_cast<Regs::MReg>(idx));
@@ -117,8 +117,8 @@ namespace SOCPU::SOARCHv2{
 				bus.RST >> sreg.clr >> regs[0].clr;
 				bus.CLK >> sreg.clk >> regs[0].clk >> mw_or.A;
 
-				CU.D>>(zs|ys|xs|Port<2>{}|ctl_state|ALU.CMS|mr|mw);
-				sreg.D>>(ctl_state|ALU.Co);
+				CU.D>>(zs|ys|xs|Port<2>{}|INTA|ctl_state|ALU.CMS|mr|mw);
+				sreg.D>>(IRQ|ctl_state|ALU.Co);
 				CU.A>>(regs[0].Q | sreg.Q);
 				mw_or.Y>>bus.WR;
 
