@@ -9,8 +9,8 @@ namespace SOCPU::SOARCHv2 {
 		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(Init instr) const{
-		co_yield init_instr();
-		co_yield set_minus_one(MReg16::SP);//Reg16::SP=0xFFFF
+		//co_yield init_instr();
+		//co_yield set_minus_one(MReg16::SP);//Reg16::SP=0xFFFF
 		co_yield set_zero(MReg16::PC);//Reg16::PC=0x0000
 		co_yield load_instr();//load op from MEM[0]
 	}

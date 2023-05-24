@@ -162,12 +162,12 @@ uCode::gen_t uCode::next_instr() const{
 	co_yield load_instr();
 }
 uCode::gen_t uCode::stack_pop(MReg reg) const{
-	co_yield inc(MReg16::SP);
 	co_yield load(reg,MReg16::SP);
+	co_yield inc(MReg16::SP);
 }
 uCode::gen_t uCode::stack_push(MReg reg) const{
-	co_yield save(MReg16::SP,reg);
 	co_yield dec(MReg16::SP);
+	co_yield save(MReg16::SP,reg);
 }
 uCode::gen_t uCode::load_imm(MReg reg) const{
 	co_yield inc(MReg16::PC);
