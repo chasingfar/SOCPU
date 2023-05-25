@@ -8,6 +8,9 @@ namespace SOCPU::SOARCHv2 {
 	template<> uCode::gen_t uCode::gen(Unknown instr) const{
 		co_yield next_instr();
 	}
+	template<> uCode::gen_t uCode::gen(NOP instr) const{
+		co_yield next_instr();
+	}
 	template<> uCode::gen_t uCode::gen(Reset instr) const{
 		co_yield inc(MReg16::PC);
 		co_yield stack_push(MReg16::PC);
