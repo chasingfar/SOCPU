@@ -79,7 +79,6 @@ namespace DEV{
 		}
 		Code init(){
 			return {
-				imm(Reg::H,0x40),
 				cmd(0x40,0x00,0x00),// set text home address
 				cmd(0x41,0x1E,0x00),// set text area
 				cmd(0x80),// mode set - or mode
@@ -114,7 +113,7 @@ namespace DEV{
 
 			return {set_a0(1),write(data)};
 		}
-		Code init(uint16_t addr){
+		Code init80(uint16_t addr){
 			return {
 				icw1((addr>>5)&0b111u,false,true,true,true),
 				//icw2(0b10101000),
@@ -122,12 +121,20 @@ namespace DEV{
 				icw4(false,false,false,true,false),
 			};
 		}
+		Code init86(uint8_t addr){
+			return {
+				icw1(0,false,true,true,true),
+				//icw2(0b10101000),
+				icw2((addr&0x1fu)<<3),
+				icw4(false,false,false,true,true),
+			};
+		}
 	}
 }
 
 int main() {
 	/*
-	if(std::ofstream fout("soarchv2-soisv1-2.txt");fout) {
+	if(std::ofstream fout("soarchv2-soisv1-3.txt");fout) {
 		using namespace std::views;
 		generateROM(fout,iota(0uz)|take(1uz<<19uz)|transform([](size_t i){
 			return SOARCHv2::uCode(i).generate<SOASM::SOISv1::InstrSet>().val();
@@ -175,32 +182,31 @@ int main() {
 	{
 		using namespace SOASM::SOISv1;
 		using namespace DEV;
-		SOASM::Label::tbl_t LT;
-		/*SOASM::ASM<InstrSet>::Code program{
-			Jump{}(LT["main"]),0x00,
-			Jump{}(LT["isr1"]),0x00,
-			Jump{}(LT["isr2"]),0x00,
-			Jump{}(LT["isr3"]),0x00,
-			Jump{}(LT["isr4"]),0x00,
-			Jump{}(LT["isr5"]),0x00,
-			Jump{}(LT["isr6"]),0x00,
-			Jump{}(LT["isr7"]),0x00,
-			LT["main"],
+		SOASM::Label::tbl_t L;
+		SOASM::ASM<InstrSet>::Code program{
+			Jump{}(L["main"]),0xff,
+			Jump{}(L["isr1"]),0xff,
+			Jump{}(L["isr2"]),0xff,
+			Jump{}(L["isr3"]),0xff,
+			Jump{}(L["isr4"]),0xff,
+			Jump{}(L["isr5"]),0xff,
+			Jump{}(L["isr6"]),0xff,
+			Jump{}(L["isr7"]),0xff,
+			L["main"],
 			DEV::init(),
 			LCD::init(),
 			LCD::show("Hello, world!"),
-			PIC::init(),
+			PIC::init86(0x00),
 			Halt{}(),
-			LT["isr1"],LCD::show('1'),Return{}(),
-			LT["isr2"],LCD::show('2'),Return{}(),
-			LT["isr3"],LCD::show('3'),Return{}(),
-			LT["isr4"],LCD::show('4'),Return{}(),
-			LT["isr5"],LCD::show('5'),Return{}(),
-			LT["isr6"],LCD::show('6'),Return{}(),
-			LT["isr7"],LCD::show('7'),Return{}(),
-
-		};*/
-		SOASM::ASM<InstrSet>::Code program{
+			L["isr1"],LCD::show('1'),Return{}(),
+			L["isr2"],LCD::show('2'),Return{}(),
+			L["isr3"],LCD::show('3'),Return{}(),
+			L["isr4"],LCD::show('4'),Return{}(),
+			L["isr5"],LCD::show('5'),Return{}(),
+			L["isr6"],LCD::show('6'),Return{}(),
+			L["isr7"],LCD::show('7'),Return{}(),
+		};
+		/*SOASM::ASM<InstrSet>::Code program{
 			DEV::init(),
 			LCD::init(),
 			LCD::show("Hello, world!"),
@@ -225,7 +231,7 @@ int main() {
 			LT["isr5"],LCD::show('g'),Return{}(),
 			LT["isr6"],LCD::show('h'),Return{}(),
 			LT["isr7"],LCD::show('i'),Return{}(),
-		};
+		};*/
 		
 		auto data=program.assemble();
 		for(auto [addr,bytes,str]:SOASM::ASM<InstrSet>::Code::disassemble(data)){
@@ -235,10 +241,10 @@ int main() {
 			}
 			std::cout<<std::format("{0:016b}:{1:27};{0}:{2}\n",addr,bytes_str,str);
 		}
-		/*if(std::ofstream fout("pic-soisv1.txt");fout) {
+		if(std::ofstream fout("pic-soisv1-3.txt");fout) {
 			using namespace std::views;
 			generateROM(fout,data);
-		}*/
+		}
 		//vm.load(program);
 		//for(auto [name,id,w]:ezis::list_instr()){
 		//	std::cout<<std::format("{}:{} {}",name,id<<w,1<<w)<<std::endl;
@@ -263,9 +269,9 @@ int main() {
 		}
 		std::cout<<"],"<<std::endl;
 	}*/
-/*
-	vm.reset();
-	for(int i=0;i<50;i++){
+
+	/*vm.reset();
+	for(int i=0;i<500;i++){
 		using namespace SOARCHv2;
 		//if(i==8){DCSim::Circuit::debug=true;}
 		//if(i==10){DCSim::Circuit::debug=false;}
@@ -279,8 +285,8 @@ int main() {
 		if(vm.is_halt()){
 			break;
 		}
-	}
-*/
+	}*/
+
 	//port_print_linked(vm.cpu.mo.buf.O);
 	//port_print_linked(vm.cpu.mi.buf.I);
 	//port_print_linked(vm.cpu.mi.buf.O);

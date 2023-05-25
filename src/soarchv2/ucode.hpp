@@ -66,14 +66,13 @@ namespace SOCPU::SOARCHv2 {
 		[[nodiscard]] gen_t sign_extend(MReg16 reg16) const;
 
 		[[nodiscard]] gen_t load_instr() const;
-		[[nodiscard]] gen_t init_instr() const;
 		[[nodiscard]] gen_t next_instr() const;
 		[[nodiscard]] gen_t stack_pop(MReg reg) const;
 		[[nodiscard]] gen_t stack_pop(MReg16 reg16) const;
 		[[nodiscard]] gen_t stack_push(MReg reg) const;
 		[[nodiscard]] gen_t stack_push(MReg16 reg16) const;
 		[[nodiscard]] gen_t load_imm(MReg reg) const;
-		[[nodiscard]] gen_t load_imm(MReg16 reg16, bool from_int = false) const;
+		[[nodiscard]] gen_t load_imm(MReg16 reg16) const;
 		[[nodiscard]] gen_t load_imm_extend(MReg16 reg16) const;
 		[[nodiscard]] gen_t jump(MReg16 addr) const;
 		[[nodiscard]] gen_t branch(MReg16 addr, Carry cond = Carry::yes) const;

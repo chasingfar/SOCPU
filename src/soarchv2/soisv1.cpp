@@ -8,11 +8,16 @@ namespace SOCPU::SOARCHv2 {
 	template<> uCode::gen_t uCode::gen(Unknown instr) const{
 		co_yield next_instr();
 	}
-	template<> uCode::gen_t uCode::gen(Init instr) const{
-		//co_yield init_instr();
-		//co_yield set_minus_one(MReg16::SP);//Reg16::SP=0xFFFF
-		co_yield set_zero(MReg16::PC);//Reg16::PC=0x0000
-		co_yield load_instr();//load op from MEM[0]
+	template<> uCode::gen_t uCode::gen(Reset instr) const{
+		co_yield inc(MReg16::PC);
+		co_yield stack_push(MReg16::PC);
+
+		co_yield copy(MReg::PCL,MReg::INST);
+		co_yield shift_left(MReg::PCL,MReg::PCL,0);
+		co_yield shift_left(MReg::PCL,MReg::PCL,0);
+		co_yield set_zero(MReg::PCH);
+
+		co_yield load_instr();
 	}
 	template<> uCode::gen_t uCode::gen(LoadFar instr) const{
 		co_yield load_imm(MReg16::TMP);
@@ -167,23 +172,6 @@ namespace SOCPU::SOARCHv2 {
 	}
 	template<> uCode::gen_t uCode::gen(Halt instr) const{
 		co_yield halt();
-	}
-	template<> uCode::gen_t uCode::gen(INTCall instr) const{
-		auto save_IF=ctl.nop();
-		save_IF.IF=arg.isINT()?1:0;
-		co_yield save_IF;
-		if(arg.IF==1){
-			co_yield stack_push(MReg16::PC);
-			co_yield load_imm(MReg16::PC,true);
-			auto jump_to=ctl.load(MReg::INST,MReg16::PC);
-			jump_to.IF=0;
-			co_yield jump_to;
-		}else{
-			co_yield inc(MReg16::PC);
-			co_yield stack_push(MReg16::PC);
-			co_yield load_imm(MReg16::TMP);
-			co_yield jump(MReg16::TMP);
-		}
 	}
 
 } // SOCPU::SOARCHv2
