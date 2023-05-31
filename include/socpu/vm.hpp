@@ -51,9 +51,9 @@ namespace SOCPU::Sim{
 		}
 		[[nodiscard]] Util::Printable print(const MEM::ptrs_t& ptrs,BUS::addr_t d=2) const {
 			return [=](std::ostream& os){
-				os<<"INSTR:"<<InstrSet::visit([](auto instr){
+				os<<"INSTR:"<<std::visit([](auto instr){
 					return decltype(instr)::name;
-				},cpu.get_instr())<<std::endl;
+				},InstrSet::get_instr(cpu.get_instr()))<<std::endl;
 				os<<cpu.print();
 				mem.print_ptrs(os, ptrs,d);
 			};

@@ -3,6 +3,7 @@
 #define SOCPU_UCODE_GEN_HPP
 
 #include <cstddef>
+#include <variant>
 #include <generator.hpp>
 namespace SOCPU{
 	template<typename T>
@@ -10,7 +11,7 @@ namespace SOCPU{
 		template<typename InstrSet>
 		auto generate() const{
 			using CTL=decltype(self()->ctl);
-			return InstrSet::visit([&](auto instr_obj){
+			return std::visit([&](auto instr_obj){
 				using namespace std::views;
 				CTL ctl=CTL::make();
 				auto index=self()->arg.index;
@@ -24,7 +25,7 @@ namespace SOCPU{
 					}
 				}
 				return ctl;
-			},self()->arg.instr);
+			},InstrSet::get_instr(self()->arg.instr));
 		}
 	private:
 		//CRTP guard from https://www.fluentcpp.com/2017/05/12/curiously-recurring-template-pattern/
