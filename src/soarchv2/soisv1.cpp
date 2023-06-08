@@ -122,9 +122,18 @@ namespace SOCPU::SOARCHv2 {
 		co_yield stack_push(MReg::TMA);
 		co_yield next_instr();
 	}
-	template<> uCode::gen_t uCode::gen(BranchCF instr) const{
-		co_yield load_imm(MReg16::TMP);
-		co_yield branch(MReg16::TMP);
+	template<> uCode::gen_t uCode::gen(PushCF instr) const{
+		co_yield set_zero(MReg::TMA);
+		if(arg.CF==Carry::yes){
+			co_yield inc(MReg::TMA);
+		}
+		co_yield stack_push(MReg::TMA);
+		co_yield next_instr();
+	}
+	template<> uCode::gen_t uCode::gen(PopCF instr) const{
+		co_yield stack_pop(MReg::TMA);
+		co_yield test_zero(MReg::TMA,MReg::TMA);
+		co_yield save_carry();
 		co_yield next_instr();
 	}
 	template<> uCode::gen_t uCode::gen(BranchZero instr) const{
